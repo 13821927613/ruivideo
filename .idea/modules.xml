@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ruivideo.iml" filepath="$PROJECT_DIR$/ruivideo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ruivideo-common/ruivideo-common.iml" filepath="$PROJECT_DIR$/ruivideo-common/ruivideo-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ruivideo-mapper/ruivideo-mapper.iml" filepath="$PROJECT_DIR$/ruivideo-mapper/ruivideo-mapper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ruivideo-mini-api/ruivideo-mini-api.iml" filepath="$PROJECT_DIR$/ruivideo-mini-api/ruivideo-mini-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ruivideo-pojo/ruivideo-pojo.iml" filepath="$PROJECT_DIR$/ruivideo-pojo/ruivideo-pojo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ruivideo-service/ruivideo-service.iml" filepath="$PROJECT_DIR$/ruivideo-service/ruivideo-service.iml" />
+    </modules>
+  </component>
+</project>
