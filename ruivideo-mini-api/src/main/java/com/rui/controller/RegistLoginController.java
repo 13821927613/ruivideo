@@ -1,8 +1,12 @@
 package com.rui.controller;
 
 
+import com.rui.pojo.vo.UsersVo;
+import net.sf.jsqlparser.expression.UserVariable;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,9 +20,11 @@ import com.rui.utils.MD5Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+import java.util.UUID;
+
 @RestController
 @Api(value="用户注册登录的接口", tags= {"注册和登录的controller"})
-public class RegistLoginController {
+public class RegistLoginController extends BasicController{
 	
 	@Autowired
 	private UserService userService;
@@ -44,7 +50,8 @@ public class RegistLoginController {
 				userService.saveUser(user);
 
 				user.setPassword("");
-				return JsonResult.ok(user);
+				UsersVo usersVo = setUserRedisSessionToken(user);
+				return JsonResult.ok(usersVo);
 			} else {
 				return JsonResult.errorMsg("用户名已存在！");
 			}
@@ -67,7 +74,8 @@ public class RegistLoginController {
 					MD5Utils.getMD5Str(user.getPassword()));
 			if (users != null) {
 				users.setPassword("");
-				return JsonResult.ok(users);
+				UsersVo usersVo = setUserRedisSessionToken(users);
+				return JsonResult.ok(usersVo);
 			} else {
 				return JsonResult.errorMsg("用户名密码错误");
 			}
@@ -77,5 +85,16 @@ public class RegistLoginController {
 			return JsonResult.errorMsg(e.getMessage());
 		}
 	}
-	
+
+	private UsersVo setUserRedisSessionToken(Users userModel) {
+
+		String uniqueToken = UUID.randomUUID().toString();
+		redis.set(USER_REDIS_SESSION + ":" + userModel.getId(), uniqueToken, 1000*60*30);
+
+		UsersVo usersVo = new UsersVo();
+		BeanUtils.copyProperties(userModel, usersVo);
+		usersVo.setUserToken(uniqueToken);
+		return usersVo;
+	}
+
 }
