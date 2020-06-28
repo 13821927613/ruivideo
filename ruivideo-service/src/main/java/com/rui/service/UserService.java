@@ -8,10 +8,18 @@ public interface UserService {
 	/**
 	 * @Description: 判断用户名是否存在
 	 */
-	public boolean queryUsernameIsExist(String username);
+	boolean queryUsernameIsExist(String username);
 	
 	/**
 	 * @Description: 保存用户(用户注册)
 	 */
-	public void saveUser(Users user);
+	void saveUser(Users user);
+
+	/**
+	 * 根据用户名密码查询用户
+	 * @param username 用户名
+	 * @param password 密码
+	 * @return
+	 */
+	Users queryUsernamePassword(String username, String password);
 }

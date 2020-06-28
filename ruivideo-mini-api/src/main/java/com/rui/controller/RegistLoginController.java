@@ -3,6 +3,7 @@ package com.rui.controller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,12 +42,39 @@ public class RegistLoginController {
 				user.setFansCounts(0);
 				user.setReceiveLikeCounts(0);
 				userService.saveUser(user);
-				return JsonResult.ok();
+
+				user.setPassword("");
+				return JsonResult.ok(user);
 			} else {
 				return JsonResult.errorMsg("用户名已存在！");
 			}
 		} catch (Exception e){
-			return JsonResult.errorException(e.getMessage());
+			return JsonResult.errorMsg(e.getMessage());
+		}
+	}
+
+	@ApiOperation(value = "用户登陆", notes = "用户登陆的接口")
+	@PostMapping("/login")
+	public JsonResult login(@RequestBody Users user) {
+
+		try{
+			//判断用户名密码是否为空
+			if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getPassword())){
+				return JsonResult.errorMsg("用户名或密码不能为空");
+			}
+			//判断用户是否存在
+			Users users = userService.queryUsernamePassword(user.getUsername(),
+					MD5Utils.getMD5Str(user.getPassword()));
+			if (users != null) {
+				users.setPassword("");
+				return JsonResult.ok(users);
+			} else {
+				return JsonResult.errorMsg("用户名密码错误");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return JsonResult.errorMsg(e.getMessage());
 		}
 	}
 	
