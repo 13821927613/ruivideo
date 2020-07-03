@@ -2,8 +2,11 @@ package com.rui.controller;
 
 
 import com.rui.pojo.vo.UsersVo;
+import io.swagger.annotations.ApiImplicitParam;
 import net.sf.jsqlparser.expression.UserVariable;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -28,14 +31,18 @@ public class RegistLoginController extends BasicController{
 	
 	@Autowired
 	private UserService userService;
+
+	private Logger log = LoggerFactory.getLogger(RestController.class);
 	
 	@ApiOperation(value="用户注册", notes="用户注册的接口")
 	@PostMapping("/regist")
 	public JsonResult regist(@RequestBody Users user) {
 
+		log.info("user regist");
 		try {
 			//判断用户名和密码是否为空
 			if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getPassword())) {
+				log.warn("username or password is null");
 				return JsonResult.errorMsg("用户名或密码不能为空！");
 			}
 			//判断用户名是否存在
@@ -51,8 +58,10 @@ public class RegistLoginController extends BasicController{
 
 				user.setPassword("");
 				UsersVo usersVo = setUserRedisSessionToken(user);
+				log.info("regist success");
 				return JsonResult.ok(usersVo);
 			} else {
+				log.info("username already exists");
 				return JsonResult.errorMsg("用户名已存在！");
 			}
 		} catch (Exception e){
@@ -64,9 +73,11 @@ public class RegistLoginController extends BasicController{
 	@PostMapping("/login")
 	public JsonResult login(@RequestBody Users user) {
 
+		log.info("login");
 		try{
 			//判断用户名密码是否为空
 			if (StringUtils.isBlank(user.getUsername()) || StringUtils.isBlank(user.getPassword())){
+				log.warn("username or password is null");
 				return JsonResult.errorMsg("用户名或密码不能为空");
 			}
 			//判断用户是否存在
@@ -75,8 +86,10 @@ public class RegistLoginController extends BasicController{
 			if (users != null) {
 				users.setPassword("");
 				UsersVo usersVo = setUserRedisSessionToken(users);
+				log.info("user login success");
 				return JsonResult.ok(usersVo);
 			} else {
+				log.warn("wrong username or password ");
 				return JsonResult.errorMsg("用户名密码错误");
 			}
 
@@ -84,6 +97,16 @@ public class RegistLoginController extends BasicController{
 			e.printStackTrace();
 			return JsonResult.errorMsg(e.getMessage());
 		}
+	}
+
+	@ApiOperation(value = "用户注销", notes = "用户注销的接口")
+	@ApiImplicitParam(name = "userId", value = "用户id", required = true, dataType = "String", paramType = "query")
+	@PostMapping("/logout")
+	public JsonResult logout(String userId){
+
+		log.info("logout user " + userId);
+		redis.del(USER_REDIS_SESSION + ":" +userId);
+		return JsonResult.ok();
 	}
 
 	private UsersVo setUserRedisSessionToken(Users userModel) {
