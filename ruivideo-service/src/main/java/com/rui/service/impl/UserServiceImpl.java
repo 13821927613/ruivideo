@@ -33,6 +33,7 @@ public class UserServiceImpl implements UserService {
 		return result != null;
 	}
 
+	@Transactional(propagation = Propagation.SUPPORTS)
 	@Override
 	public Users queryUsernamePassword(String username, String password) {
 
@@ -53,6 +54,15 @@ public class UserServiceImpl implements UserService {
 		user.setId(userId);
 		userMapper.insert(user);
 	}
-	
+
+	@Transactional(propagation = Propagation.REQUIRED)
+	@Override
+	public void updateUserInfo(Users user) {
+
+		Example userExample = new Example(Users.class);
+		Criteria criteria = userExample.createCriteria();
+		criteria.andEqualTo("id", user.getId());
+		userMapper.updateByExampleSelective(user, userExample);
+	}
 }
 

@@ -22,4 +22,10 @@ public interface UserService {
 	 * @return
 	 */
 	Users queryUsernamePassword(String username, String password);
+
+	/**
+	 * 更新用户信息
+	 * @param user
+	 */
+	void updateUserInfo(Users user);
 }
