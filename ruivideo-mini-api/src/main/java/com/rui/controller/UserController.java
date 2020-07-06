@@ -1,12 +1,17 @@
 package com.rui.controller;
 
 import com.rui.pojo.Users;
+import com.rui.pojo.vo.UsersVo;
 import com.rui.service.UserService;
 import com.rui.utils.JsonResult;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +34,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @ApiOperation(value = "用户上传头像", notes = "用户上传头像的接口")
+    @ApiImplicitParam(name="userId", value="用户id", required=true, dataType="String", paramType="query")
+    @PostMapping("/uploadFace")
     public JsonResult uploadFace(String userId, @RequestParam("file") MultipartFile[] files) throws IOException {
 
         if (StringUtils.isBlank(userId)) {
@@ -79,5 +87,20 @@ public class UserController {
         userService.updateUserInfo(user);
 
         return JsonResult.ok(uploadPathDB);
+    }
+
+    @ApiOperation(value = "查询用户信息", notes = "查询用户信息的接口")
+    @ApiImplicitParam(name="userId", value="用户id", required=true, dataType="String", paramType="query")
+    @PostMapping("/query")
+    public JsonResult queryUserInfo(String userId) {
+
+        if (StringUtils.isBlank(userId)) {
+            return JsonResult.errorMsg("用户id不能为空");
+        }
+        Users user = userService.queryUserInfo(userId);
+        UsersVo userVo = new UsersVo();
+        BeanUtils.copyProperties(user, userVo);
+
+        return JsonResult.ok(userVo);
     }
 }
