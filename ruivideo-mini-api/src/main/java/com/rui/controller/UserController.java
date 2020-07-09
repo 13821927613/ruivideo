@@ -11,6 +11,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,9 +45,9 @@ public class UserController {
         }
 
         //文件保存的命名空间
-        final String fileNameSpace = "D:/productivity/Source/Repos/WeChat/ruivideo_dev";
+        final String fileNameSpace = "D:/productivity/Source/Repos/WeChat/ruivideo_dev/users/";
         //保存到数据库中的相对路径
-        String uploadPathDB = "/" + userId + "/face/";
+        String uploadPathDB = "/users/" + userId + "/face/";
 
         FileOutputStream fileOutputStream = null;
         InputStream inputStream = null;

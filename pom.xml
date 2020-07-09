@@ -7,21 +7,8 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
-	<name>微信小程序-短视频实战</name>
-	<description>
-		微信小程序实战课程：
-		小程序
-		maven
-		springmvc
-		springboot
-		mybatis
-		mybatis-pagehelper
-		redis
-		ffmpeg
-		druid
-		mariadb/mysql
-		zookeeper音频操作
-	</description>
+	<name>ruiVideo</name>
+	<description>ruivideo微信小程序</description>
 	
 	<parent>
 		<groupId>org.springframework.boot</groupId>
