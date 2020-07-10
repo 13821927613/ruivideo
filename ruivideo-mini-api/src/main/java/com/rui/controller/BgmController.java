@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @program: ruivideo
- * @description:
+ * @description: 背景音乐相关接口
  * @author: huangrui
  * @create: 2020-07-09 10:59
  **/
