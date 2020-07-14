@@ -9,6 +9,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +37,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    private Logger log = LoggerFactory.getLogger(UserController.class);
+
     @ApiOperation(value = "用户上传头像", notes = "用户上传头像的接口")
     @ApiImplicitParam(name="userId", value="用户id", required=true, dataType="String", paramType="query")
     @PostMapping("/uploadFace")
@@ -44,8 +48,9 @@ public class UserController {
             return JsonResult.errorMsg("用户id不能为空");
         }
 
+        log.info("change user face, userId: " + userId);
         //文件保存的命名空间
-        final String fileNameSpace = "D:/productivity/Source/Repos/WeChat/ruivideo_dev/users/";
+        final String fileNameSpace = "D:/productivity/Source/Repos/WeChat/ruivideo_dev";
         //保存到数据库中的相对路径
         String uploadPathDB = "/users/" + userId + "/face/";
 
@@ -68,11 +73,14 @@ public class UserController {
                     fileOutputStream = new FileOutputStream(outFile);
                     inputStream = files[0].getInputStream();
                     IOUtils.copy(inputStream, fileOutputStream);
+                    log.info("face image save success! file path: " + finalPath);
                 } else {
+                    log.error("face image upload fail");
                     return JsonResult.errorMsg("上传出错");
                 }
             }
         } catch (Exception e) {
+            log.error("face image upload fail");
             e.printStackTrace();
             return JsonResult.errorMsg("上传出错");
         } finally {
@@ -98,9 +106,11 @@ public class UserController {
         if (StringUtils.isBlank(userId)) {
             return JsonResult.errorMsg("用户id不能为空");
         }
+        log.info("query user info, userId: " + userId);
         Users user = userService.queryUserInfo(userId);
         UsersVo userVo = new UsersVo();
         BeanUtils.copyProperties(user, userVo);
+        log.info("query user info success");
 
         return JsonResult.ok(userVo);
     }

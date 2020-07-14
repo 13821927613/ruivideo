@@ -6,6 +6,8 @@ import com.rui.utils.JsonResult;
 import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,14 +34,16 @@ public class VideoController {
     @Autowired
     private VideoService videoService;
 
+    private Logger log = LoggerFactory.getLogger(VideoController.class);
+
     @ApiOperation(value = "用户上传视频", notes = "用户上传视频的接口")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="userId", value="用户id", required=true, dataType="String", paramType="query"),
-            @ApiImplicitParam(name="bgmId", value="背景音乐id", required=false, dataType="String", paramType="query"),
-            @ApiImplicitParam(name="videoSeconds", value="视频时长", required=true, dataType="double", paramType="query"),
-            @ApiImplicitParam(name="desc", value="视频描述", required=false, dataType="String", paramType="query"),
-            @ApiImplicitParam(name="videoHigh", value="视频高度", required=true, dataType="int", paramType="query"),
-            @ApiImplicitParam(name="videoWeight", value="视频宽度", required=true, dataType="int", paramType="query")
+            @ApiImplicitParam(name="userId", value="用户id", required=true, dataType="String", paramType="form"),
+            @ApiImplicitParam(name="bgmId", value="背景音乐id", required=false, dataType="String", paramType="form"),
+            @ApiImplicitParam(name="videoSeconds", value="视频时长", required=true, dataType="double", paramType="form"),
+            @ApiImplicitParam(name="desc", value="视频描述", required=false, dataType="String", paramType="form"),
+            @ApiImplicitParam(name="videoHigh", value="视频高度", required=true, dataType="int", paramType="form"),
+            @ApiImplicitParam(name="videoWeight", value="视频宽度", required=true, dataType="int", paramType="form")
     })
     @PostMapping(value = "/upload", headers = "content-type=multipart/form-data")
     public JsonResult upload(String userId, String bgmId, double videoSeconds, String desc,
@@ -50,8 +54,9 @@ public class VideoController {
             return JsonResult.errorMsg("用户id不能为空");
         }
 
+        log.info("user upload video, userId: " + userId);
         //文件保存的命名空间
-        final String fileNameSpace = "D:/productivity/Source/Repos/WeChat/ruivideo_dev/users/";
+        final String fileNameSpace = "D:/productivity/Source/Repos/WeChat/ruivideo_dev";
         //保存到数据库中的相对路径
         String videoPathDb = "/users/" + userId + "/videos/";
 
@@ -75,11 +80,14 @@ public class VideoController {
                     fileOutputStream = new FileOutputStream(outFile);
                     inputStream = file.getInputStream();
                     IOUtils.copy(inputStream, fileOutputStream);
+                    log.info("video upload success, file path: " + finalPath);
                 } else {
+                    log.error("video upload fail");
                     return JsonResult.errorMsg("上传出错");
                 }
             }
         } catch (Exception e) {
+            log.error("video upload fail");
             e.printStackTrace();
             return JsonResult.errorMsg("上传出错");
         } finally {
