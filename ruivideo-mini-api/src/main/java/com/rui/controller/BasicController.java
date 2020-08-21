@@ -21,4 +21,6 @@ public class BasicController {
 
     public static final String FINAL_NAME_SPACE = "D:/productivity/Source/Repos/WeChat/ruivideo_dev";
 
+    public static final String FFMPEG_EXE = "D:\\productivity\\ffmpg\\ffmpeg-20200628-4cfcfb3-win64-static\\bin\\ffmpeg.exe";
+
 }

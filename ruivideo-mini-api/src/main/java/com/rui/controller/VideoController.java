@@ -1,9 +1,13 @@
 package com.rui.controller;
 
 import com.rui.enums.VideoStatusEnum;
+import com.rui.pojo.Bgm;
 import com.rui.pojo.Videos;
+import com.rui.service.BgmService;
 import com.rui.service.VideoService;
+import com.rui.utils.FetchVideoCover;
 import com.rui.utils.JsonResult;
+import com.rui.utils.MergeVideoBgm;
 import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @program: ruivideo
@@ -37,6 +43,9 @@ public class VideoController extends BasicController{
 
     @Autowired
     private VideoService videoService;
+
+    @Autowired
+    private BgmService bgmService;
 
     @Autowired
     private Sid sid;
@@ -68,12 +77,37 @@ public class VideoController extends BasicController{
         String videoId = sid.nextShort();
         //保存到数据库中的相对路径
         String videoPathDb = "/users/" + userId + "/videos/" + videoId + "/";
+        String coverPathDb = "/users/" + userId + "/videos/" + videoId + "/";
 
         try {
             log.info("upload video");
             boolean uploadSuccess = uploadFile(file, videoPathDb);
             if (!uploadSuccess) {
                 return JsonResult.errorMsg("上传视频失败");
+            }
+            String videoName = file.getOriginalFilename();
+            String videoFinalPath = FINAL_NAME_SPACE + videoPathDb + videoName;
+            String videoFileName = "";
+            String videoFormat = "mp4";
+            Pattern p = Pattern.compile("(^.*)\\.(.*$)");
+            Matcher m = p.matcher(videoName);
+            if (m.find()) {
+                videoFileName = m.group(1);
+                videoFormat = m.group(2);
+            }
+            //保存视频截图
+            FetchVideoCover fetchVideoCover  = new FetchVideoCover(FFMPEG_EXE);
+            fetchVideoCover.fetch(videoFinalPath, FINAL_NAME_SPACE + coverPathDb + "cover.jpg");
+            //合并视频音频
+            if (!StringUtils.isBlank(bgmId)) {
+                Bgm bgm = bgmService.queryBgmById(bgmId);
+                if (bgm != null) {
+                    String bgmPath = FINAL_NAME_SPACE + bgm.getPath();
+                    videoFileName += "_output." + videoFormat;
+                    MergeVideoBgm mergeVideoBgm = new MergeVideoBgm(FFMPEG_EXE);
+                    mergeVideoBgm.convert(videoFinalPath, bgmPath, videoSeconds,
+                            FINAL_NAME_SPACE + videoPathDb + videoFileName);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,6 +123,7 @@ public class VideoController extends BasicController{
         video.setVideoHeight(videoHigh);
         video.setVideoDesc(desc);
         video.setVideoPath(videoPathDb);
+        video.setCoverPath(coverPathDb);
         video.setStatus(VideoStatusEnum.SUCCESS.value);
         video.setCreateTime(new Date());
         video.setId(videoId);
@@ -97,7 +132,7 @@ public class VideoController extends BasicController{
         return JsonResult.ok(videoId);
     }
 
-    @ApiOperation(value = "用户上传视频", notes = "用户上传视频的接口")
+    @ApiOperation(value = "用户上传视频封面", notes = "用户上传视频封面的接口")
     @ApiImplicitParams({
             @ApiImplicitParam(name="userId", value="用户id", required=true, dataType="String", paramType="form"),
             @ApiImplicitParam(name="videoId", value="视频主键id", required=true, dataType="String", paramType="form")

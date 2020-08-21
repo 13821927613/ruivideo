@@ -12,44 +12,32 @@ import java.util.List;
 
 /**
  * @program: ruivideo
- * @description: 合并视频和背景音乐
+ * @description: 获取视频截图
  * @author: huangrui
- * @create: 2020-07-22 11:31
+ * @create: 2020-08-21 14:39
  **/
 
-public class MergeVideoBgm {
+public class FetchVideoCover {
+
+    private Logger log = LoggerFactory.getLogger(FetchVideoCover.class);
 
     private String ffmpegEXE;
 
-    private Logger log = LoggerFactory.getLogger(MergeVideoBgm.class);
-
-    //private Logger log = LoggerFactory.getLogger(MergeVideoBgm.class);
-
-    public MergeVideoBgm(String ffmpegEXE) {
+    public FetchVideoCover(String ffmpegEXE) {
         this.ffmpegEXE = ffmpegEXE;
     }
 
-    public void convert(String videoInputPath, String bgmInputPath, double time, String outputPath) throws IOException {
-//  ffmpeg -i video.mp4 -i audio.wav -c:v copy -c:a aac -strict experimental -map 0:v:0 -map 1:a:0 output.mp4
+    public void fetch(String videoInputPath, String outputPath) throws IOException {
+        //ffmpeg.exe -ss 00:00:01 -y -i testvideo.mp4 -vframes 1 new.jpg
         List<String> command = new ArrayList<>();
         command.add(ffmpegEXE);
+        command.add("-ss");
+        command.add("00:00:01");
+        command.add("-y");
         command.add("-i");
         command.add(videoInputPath);
-        command.add("-i");
-        command.add(bgmInputPath);
-        command.add("-t");
-        command.add(String.valueOf(time));
-        command.add("-c:v");
-        command.add("copy");
-        command.add("-c:a");
-        command.add("aac");
-        command.add("-strict");
-        command.add("experimental");
-        command.add("-map");
-        command.add("0:v:0");
-        command.add("-map");
-        command.add("1:a:0");
-        command.add("-y");
+        command.add("-vframes");
+        command.add("1");
         command.add(outputPath);
 
         StringBuilder cmd = new StringBuilder();
@@ -80,13 +68,11 @@ public class MergeVideoBgm {
     }
 
     public static void main(String[] args) {
-        MergeVideoBgm mergeVideoBgm = new MergeVideoBgm("D:\\productivity\\ffmpg\\ffmpeg-20200628-4cfcfb3-win64-static\\bin\\ffmpeg.exe");
+        FetchVideoCover fetchVideoCover  = new FetchVideoCover("D:\\productivity\\ffmpg\\ffmpeg-20200628-4cfcfb3-win64-static\\bin\\ffmpeg.exe");
         String videoInputPath = "D:\\productivity\\ffmpg\\ffmpeg-20200628-4cfcfb3-win64-static\\bin\\testvideo.mp4";
-        String bgmInputPath = "D:\\productivity\\ffmpg\\ffmpeg-20200628-4cfcfb3-win64-static\\bin\\bgm.flac";
-        double time = 11.14;
-        String outputPath = "D:\\productivity\\ffmpg\\ffmpeg-20200628-4cfcfb3-win64-static\\bin\\output1.mp4";
+        String outputPath = "D:\\productivity\\ffmpg\\ffmpeg-20200628-4cfcfb3-win64-static\\bin\\cover.jpg";
         try {
-            mergeVideoBgm.convert(videoInputPath, bgmInputPath, time, outputPath);
+            fetchVideoCover.fetch(videoInputPath, outputPath);
         } catch (Exception e) {
             e.printStackTrace();
         }

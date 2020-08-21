@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 
@@ -27,5 +28,15 @@ public class BgmServiceImpl implements BgmService {
     @Override
     public List<Bgm> queryBgmList() {
         return bgmMapper.selectAll();
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public Bgm queryBgmById(String bgmId) {
+        Example bgmExample = new Example(Bgm.class);
+        Example.Criteria criteria = bgmExample.createCriteria();
+        criteria.andEqualTo("id", bgmId);
+
+        return bgmMapper.selectOneByExample(bgmExample);
     }
 }
