@@ -19,4 +19,6 @@ public class BasicController {
 
     public static final String USER_REDIS_SESSION = "user-redis-session";
 
+    public static final String FINAL_NAME_SPACE = "D:/productivity/Source/Repos/WeChat/ruivideo_dev";
+
 }

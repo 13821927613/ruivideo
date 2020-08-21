@@ -6,6 +6,8 @@ import com.rui.service.VideoService;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @program: ruivideo
@@ -23,10 +25,18 @@ public class VideoServiceImpl implements VideoService {
     @Autowired
     private Sid sid;
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void saveVideo(Videos video) {
-        String videoId = sid.nextShort();
+        videoMapper.insertSelective(video);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void uploadVideoCover(String videoId, String coverPath) {
+        Videos video = new Videos();
         video.setId(videoId);
-        videoMapper.insert(video);
+        video.setCoverPath(coverPath);
+        videoMapper.updateByPrimaryKeySelective(video);
     }
 }
